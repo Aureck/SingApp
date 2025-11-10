@@ -1,0 +1,10 @@
+mediapipe==0.10.14
+tensorflow-intel==2.17.0
+ml-dtypes>=0.3.1,<0.5.0
+protobuf>=4.25.0,<5
+opencv-python
+PyQt5
+scikit-learn
+pandas
+numpy==1.26.4
+joblib

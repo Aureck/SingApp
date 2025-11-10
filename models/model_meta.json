@@ -1,0 +1,25 @@
+{
+  "trained_on": "keypoints+aug",
+  "label_col": "label",
+  "n_features": 126,
+  "classes": [
+    "a",
+    "azul",
+    "b",
+    "buenas_noches",
+    "c",
+    "como_estas",
+    "como_te_llamas",
+    "d",
+    "esta_bien",
+    "gracias",
+    "hola",
+    "primera_vez",
+    "que",
+    "que_dice",
+    "rojo",
+    "yo_bien"
+  ],
+  "min_conf": 0.55,
+  "val_accuracy": 0.826302729528536
+}
