@@ -1,10 +1,11 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QPushButton, QLabel, QSpacerItem, QSizePolicy
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
 
 class AdminMenu(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("⚙️ Panel de Administración")
+        self.setWindowTitle(" Panel de Administración")
         self.resize(900, 600)  
         self.setStyleSheet("""
             QDialog {
@@ -44,6 +45,12 @@ class AdminMenu(QDialog):
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
 
+        # --- Imagen debajo del título ---
+        img = QLabel()
+        img.setAlignment(Qt.AlignCenter)
+        img.setPixmap(QPixmap("styles/cohe.png").scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        layout.addWidget(img)
+
         # --- Botones grandes ---
         self.btn_user_mode = QPushButton("👂 Atención a usuarios no oyentes")
         self.btn_signs     = QPushButton("✋ Gestionar señas y videos")
@@ -55,26 +62,21 @@ class AdminMenu(QDialog):
 
         layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
-        # Variable para saber qué opción eligió
         self.choice = None
 
-        # Conexiones
         self.btn_user_mode.clicked.connect(lambda: self._select("user_mode", self.btn_user_mode))
         self.btn_signs.clicked.connect(lambda: self._select("signs", self.btn_signs))
         self.btn_users.clicked.connect(lambda: self._select("users", self.btn_users))
 
     def _select(self, choice, btn):
-        # 🔹 Desactiva visualmente los demás
         for b in [self.btn_user_mode, self.btn_signs, self.btn_users]:
             b.setProperty("active", False)
             b.style().unpolish(b)
             b.style().polish(b)
 
-        # 🔹 Activa visualmente el seleccionado
         btn.setProperty("active", True)
         btn.style().unpolish(btn)
         btn.style().polish(btn)
 
-        # 🔹 Guarda la elección
         self.choice = choice
         self.accept()

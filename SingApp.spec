@@ -65,6 +65,6 @@ exe = EXE(
     debug=False,
     strip=False,
     upx=False,
-    console=True,   
+    console=False,   
     icon='icon.ico', 
 )

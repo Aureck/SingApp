@@ -22,6 +22,8 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QTimer,Qt
 from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtWidgets import QSizePolicy
+
 
 
 
@@ -204,8 +206,8 @@ class RecorderWindow(QDialog):
         res = self.hands.process(cv2.cvtColor(small, cv2.COLOR_BGR2RGB))
         hand_count = len(res.multi_hand_landmarks) if res.multi_hand_landmarks else 0
 
-        # --- dibujar landmarks solo en frame_draw ---
-        if res.multi_hand_landmarks:
+        # --- dibujar landmarks solo si está habilitado en draw_landmarks ---
+        if res.multi_hand_landmarks and self.draw_landmarks:
             res_big = self.hands.process(cv2.cvtColor(frame_draw, cv2.COLOR_BGR2RGB))
             draw_hands(frame_draw, res_big)
 
@@ -405,7 +407,7 @@ class PlayerWindow(QDialog):
     def _loop(self):
         ok, frame = self.cap.read()
         if not ok:
-            self.close()  # termina
+            self.close()  
             return
         # detección
         small = cv2.resize(frame, PROC_SIZE)
@@ -527,6 +529,7 @@ class LSPDashboard(QMainWindow):
             idx = self.tabs.indexOf(self.tab_datos)
             if idx != -1:
                 self.tabs.removeTab(idx)
+
 
         # Control de acceso según rol
         if self.role == "usuario":
@@ -669,18 +672,6 @@ class LSPDashboard(QMainWindow):
         lv.addWidget(self.video_label, stretch=1)
         lv.addWidget(self.lbl_detected)
         lv.addWidget(self.txt_sentence, stretch=1)
-
-        # ===== Tabs =====
-        self.tabs = QTabWidget()
-        self.tab_datos = self._tab_datos()
-        self.tab_responder = self._tab_responder()
-        self.tab_settings = self._tab_settings()
-        self.tab_history = self._tab_history()
-
-        self.tabs.addTab(self.tab_datos, "Datos")
-        self.tabs.addTab(self.tab_responder, "Responder")
-        self.tabs.addTab(self.tab_settings, "Ajustes")
-        self.tabs.addTab(self.tab_history, "Historial")
 
         # ===== Control de acceso =====
         if self.role == "usuario":
@@ -1126,38 +1117,39 @@ class LSPDashboard(QMainWindow):
 
         chat_frame.addWidget(self.chat_list)
 
-        # --- INPUT + BOTÓN ENVIAR ---
+       # --- INPUT + BOTÓN ENVIAR ---
         row_chat = QHBoxLayout()
+        row_chat.setContentsMargins(12, 8, 12, 12)  
+        row_chat.setSpacing(10)
+
         self.chat_input = QLineEdit()
         self.chat_input.setPlaceholderText("Escribe un mensaje...")
-        self.chat_input.setMinimumHeight(30)
+        self.chat_input.setMinimumHeight(40)  
         self.chat_input.setStyleSheet("""
             QLineEdit {
-                border: 2px solid #cfd8e3;
+                border: 2px solid #3498db;
                 border-radius: 12px;
-                padding: 6px 10px;
+                padding: 8px 12px;
                 font-size: 14px;
+                background-color: #ffffff;
             }
             QLineEdit:focus {
-                border: 2px solid #3498db;
+                border: 2px solid #1f6ea1;
             }
         """)
 
-        # 🔹 Botón con ícono de envío (pequeño y alineado)
         btn_send = QPushButton("➤")
         btn_send.setObjectName("sendButton")
-        btn_send.setFixedSize(32, 32)
+        btn_send.setFixedSize(36, 36)
         btn_send.setCursor(Qt.PointingHandCursor)
         btn_send.setToolTip("Enviar mensaje")
         btn_send.setStyleSheet("""
             #sendButton {
                 background-color: #2980b9;
                 color: white;
-                font-size: 12px;
-                font-weight: bold;
-                border-radius: 16px;
-                border: 1px solid #1f5a85;
-                padding: 0;
+                font-size: 14px;
+                border-radius: 18px;
+                border: none;
             }
             #sendButton:hover {
                 background-color: #3498db;
@@ -1167,14 +1159,14 @@ class LSPDashboard(QMainWindow):
             }
         """)
 
-        row_chat.addWidget(self.chat_input, 1)
-        row_chat.addWidget(btn_send, 0, Qt.AlignBottom)
         btn_send.clicked.connect(self._send_chat_message)
 
+        # 🔹 El input ocupa todo el ancho, el botón queda al final
+        row_chat.addWidget(self.chat_input, stretch=8)
+        row_chat.addWidget(btn_send, stretch=0, alignment=Qt.AlignVCenter)
 
-        row_chat.addWidget(self.chat_input, stretch=3)
-        row_chat.addWidget(btn_send, stretch=0)
         chat_frame.addLayout(row_chat)
+
 
         chat_widget = QWidget()
         chat_widget.setLayout(chat_frame)
@@ -1250,28 +1242,51 @@ class LSPDashboard(QMainWindow):
 
     
 
+    
     def _chat_add_message(self, sender, text):
         item = QListWidgetItem()
+
         if sender == "user":
-            color = "#d5fdd5"; align = Qt.AlignLeft; name = "No oyente"
+            bg_color = "#d5fdd5"
+            align = Qt.AlignLeft
+            name = "No oyente"
         else:
-            color = "#ffffff"; align = Qt.AlignRight; name = "usuario"
+            bg_color = "#cfe4ff"
+            align = Qt.AlignRight
+            name = "Usuario"
 
-        bubble = f"""
-        <div style='background-color:{color};
-                    border-radius:12px; padding:8px 10px; margin:6px;
-                    color:black; font-size:14px; max-width:300px;'>
+        # 🔹 Crea una burbuja visible con el texto en negro
+        bubble_html = f"""
+        <div style="
+            background-color:{bg_color};
+            border-radius:12px;
+            padding:8px 12px;
+            margin:6px;
+            color:black;
+            font-size:15px;
+            word-wrap:break-word;
+            white-space:pre-wrap;
+            max-width:85%;
+        ">
             <b>{name}:</b><br>{text}
-        </div>"""
-        from PyQt5.QtWidgets import QLabel
-        label = QLabel(); label.setText(bubble)
-        label.setTextFormat(Qt.RichText); label.setAlignment(align); label.setWordWrap(True)
+        </div>
+        """
 
-        item.setSizeHint(QSize(320, 60))
+        label = QLabel()
+        label.setText(bubble_html)
+        label.setTextFormat(Qt.RichText)
+        label.setAlignment(align)
+        label.setWordWrap(True)
+        label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+
+        # 🔹 Ajusta tamaño al texto
+        label.adjustSize()
+        item.setSizeHint(label.sizeHint())
+
+        # 🔹 Agregar al chat
         self.chat_list.addItem(item)
         self.chat_list.setItemWidget(item, label)
         self.chat_list.scrollToBottom()
-
 
 
     def _send_chat_message(self):

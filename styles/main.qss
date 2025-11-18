@@ -123,3 +123,24 @@ QPushButton#btnSmall:pressed,
 QPushButton#btnReply:pressed {
     background-color: #1f6ea1;
 }
+
+/* ======= Botón de envío pequeño (chat) ======= */
+QPushButton#sendButton {
+    min-width: 32px;       
+    min-height: 32px;       
+    max-width: 32px;
+    max-height: 32px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 16px;
+    background-color: #2980b9;
+    border: none;
+}
+
+QPushButton#sendButton:hover {
+    background-color: #3498db;
+}
+
+QPushButton#sendButton:pressed {
+    background-color: #2471a3;
+}

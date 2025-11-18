@@ -17,6 +17,14 @@ def load_styles(app, qss_path="styles/main.qss"):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
+    # ============  AUTO-ACTUALIZADOR  ============
+    try:
+        from updater import check_for_update
+        check_for_update()
+    except Exception as e:
+        print("[UPDATE] Error al verificar actualización:", e)
+    # ================================================
+
     icon_path = get_data_path("icon.ico")
     if os.path.exists(icon_path):
         app.setWindowIcon(QIcon(icon_path))

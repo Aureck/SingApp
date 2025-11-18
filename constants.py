@@ -54,7 +54,7 @@ AUTO_PROCESS_AFTER_RECORD = True # generar/actualizar CSV automáticamente
 AUG_PER_FRAME     = 3        # cuántas variantes por frame (0 = sin augmentation)
 AUG_ROT_MAX_DEG   = 12       # rotación ± grados (en plano XY)
 AUG_SCALE_MINMAX  = (0.90, 1.10)
-AUG_JITTER_STD    = 0.02     # ruido gaussiano (std) sobre x,y,z normalizados
+AUG_JITTER_STD    = 0.02     # ruido gaussiano (std) sobre x,y,z normalizadosZ
 
 # ======== INFERENCIA EN TIEMPO REAL ========
 MIN_CONF          = 0.55     # baja si no detecta (0.45–0.6)
